@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package="proto";
+
+service AuthService {
+    rpc Login(UserAccess) returns (Session);
+    rpc SignUp(UserAccess) returns (Session);
+    rpc Logout(Session) returns (Message);
+    rpc SetContainerId(Container) returns (Message);
+    rpc GetContainerId(Session) returns (Message);
+    rpc DeleteAccount(Session) returns (Message);
+    rpc EmailVail(Session) returns (Message);
+    rpc IsVailEmail(Session) returns (Message);
+}
+
+message Message {
+    int32 statusCode = 1;
+    string message = 2;
+}
+
+message Session {
+    bytes session = 1;
+}
+
+message UserAccess {
+    string email = 1;
+    string passwd = 2;
+}
+
+message Container {
+    Session session = 1;
+    int32 containerId = 2;
+}

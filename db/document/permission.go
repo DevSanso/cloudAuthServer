@@ -7,3 +7,5 @@ type Permission struct {
 		Permission byte `bson:permission`
 	}`bson:accessList`
 }
+
+const PermissionName = "permission"

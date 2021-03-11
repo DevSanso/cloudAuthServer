@@ -5,12 +5,13 @@ package proto;
 option go_package="proto";
 
 service AuthService {
-    rpc Login(UserAccess) returns (Session);
-    rpc SignUp(UserAccess) returns (Session);
-    rpc Logout(Session) returns (Message);
+    rpc Login(UserAccess) returns (SessionResult);
+    rpc SignUp(UserAccess) returns (SessionResult);
+    rpc LogOut(UserAccess) returns (Message);
     rpc SetContainerId(Container) returns (Message);
     rpc GetContainerId(Session) returns (Message);
     rpc DeleteAccount(Session) returns (Message);
+    rpc ChanePasswd(ChangeInfo) returns (Message);
     rpc EmailVail(Session) returns (Message);
     rpc IsVailEmail(Session) returns (Message);
 }
@@ -23,6 +24,11 @@ message Message {
 message Session {
     bytes session = 1;
 }
+message SessionResult {
+    Message message = 1;
+    Session session = 2;
+
+}
 
 message UserAccess {
     string email = 1;
@@ -32,4 +38,9 @@ message UserAccess {
 message Container {
     Session session = 1;
     int32 containerId = 2;
+}
+
+message ChangeInfo {
+    Session session = 1;
+    string passed = 2;
 }

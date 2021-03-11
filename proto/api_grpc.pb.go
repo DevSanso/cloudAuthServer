@@ -18,12 +18,13 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthServiceClient interface {
-	Login(ctx context.Context, in *UserAccess, opts ...grpc.CallOption) (*Session, error)
-	SignUp(ctx context.Context, in *UserAccess, opts ...grpc.CallOption) (*Session, error)
-	Logout(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error)
+	Login(ctx context.Context, in *UserAccess, opts ...grpc.CallOption) (*SessionResult, error)
+	SignUp(ctx context.Context, in *UserAccess, opts ...grpc.CallOption) (*SessionResult, error)
+	LogOut(ctx context.Context, in *UserAccess, opts ...grpc.CallOption) (*Message, error)
 	SetContainerId(ctx context.Context, in *Container, opts ...grpc.CallOption) (*Message, error)
 	GetContainerId(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error)
 	DeleteAccount(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error)
+	ChanePasswd(ctx context.Context, in *ChangeInfo, opts ...grpc.CallOption) (*Message, error)
 	EmailVail(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error)
 	IsVailEmail(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error)
 }
@@ -36,27 +37,27 @@ func NewAuthServiceClient(cc grpc.ClientConnInterface) AuthServiceClient {
 	return &authServiceClient{cc}
 }
 
-func (c *authServiceClient) Login(ctx context.Context, in *UserAccess, opts ...grpc.CallOption) (*Session, error) {
-	out := new(Session)
-	err := c.cc.Invoke(ctx, "/AuthService/Login", in, out, opts...)
+func (c *authServiceClient) Login(ctx context.Context, in *UserAccess, opts ...grpc.CallOption) (*SessionResult, error) {
+	out := new(SessionResult)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/Login", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authServiceClient) SignUp(ctx context.Context, in *UserAccess, opts ...grpc.CallOption) (*Session, error) {
-	out := new(Session)
-	err := c.cc.Invoke(ctx, "/AuthService/SignUp", in, out, opts...)
+func (c *authServiceClient) SignUp(ctx context.Context, in *UserAccess, opts ...grpc.CallOption) (*SessionResult, error) {
+	out := new(SessionResult)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/SignUp", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authServiceClient) Logout(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error) {
+func (c *authServiceClient) LogOut(ctx context.Context, in *UserAccess, opts ...grpc.CallOption) (*Message, error) {
 	out := new(Message)
-	err := c.cc.Invoke(ctx, "/AuthService/Logout", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/LogOut", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +66,7 @@ func (c *authServiceClient) Logout(ctx context.Context, in *Session, opts ...grp
 
 func (c *authServiceClient) SetContainerId(ctx context.Context, in *Container, opts ...grpc.CallOption) (*Message, error) {
 	out := new(Message)
-	err := c.cc.Invoke(ctx, "/AuthService/SetContainerId", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/SetContainerId", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +75,7 @@ func (c *authServiceClient) SetContainerId(ctx context.Context, in *Container, o
 
 func (c *authServiceClient) GetContainerId(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error) {
 	out := new(Message)
-	err := c.cc.Invoke(ctx, "/AuthService/GetContainerId", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/GetContainerId", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +84,16 @@ func (c *authServiceClient) GetContainerId(ctx context.Context, in *Session, opt
 
 func (c *authServiceClient) DeleteAccount(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error) {
 	out := new(Message)
-	err := c.cc.Invoke(ctx, "/AuthService/DeleteAccount", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/DeleteAccount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) ChanePasswd(ctx context.Context, in *ChangeInfo, opts ...grpc.CallOption) (*Message, error) {
+	out := new(Message)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/ChanePasswd", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +102,7 @@ func (c *authServiceClient) DeleteAccount(ctx context.Context, in *Session, opts
 
 func (c *authServiceClient) EmailVail(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error) {
 	out := new(Message)
-	err := c.cc.Invoke(ctx, "/AuthService/EmailVail", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/EmailVail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +111,7 @@ func (c *authServiceClient) EmailVail(ctx context.Context, in *Session, opts ...
 
 func (c *authServiceClient) IsVailEmail(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error) {
 	out := new(Message)
-	err := c.cc.Invoke(ctx, "/AuthService/IsVailEmail", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/IsVailEmail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -112,12 +122,13 @@ func (c *authServiceClient) IsVailEmail(ctx context.Context, in *Session, opts .
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility
 type AuthServiceServer interface {
-	Login(context.Context, *UserAccess) (*Session, error)
-	SignUp(context.Context, *UserAccess) (*Session, error)
-	Logout(context.Context, *Session) (*Message, error)
+	Login(context.Context, *UserAccess) (*SessionResult, error)
+	SignUp(context.Context, *UserAccess) (*SessionResult, error)
+	LogOut(context.Context, *UserAccess) (*Message, error)
 	SetContainerId(context.Context, *Container) (*Message, error)
 	GetContainerId(context.Context, *Session) (*Message, error)
 	DeleteAccount(context.Context, *Session) (*Message, error)
+	ChanePasswd(context.Context, *ChangeInfo) (*Message, error)
 	EmailVail(context.Context, *Session) (*Message, error)
 	IsVailEmail(context.Context, *Session) (*Message, error)
 	mustEmbedUnimplementedAuthServiceServer()
@@ -127,14 +138,14 @@ type AuthServiceServer interface {
 type UnimplementedAuthServiceServer struct {
 }
 
-func (UnimplementedAuthServiceServer) Login(context.Context, *UserAccess) (*Session, error) {
+func (UnimplementedAuthServiceServer) Login(context.Context, *UserAccess) (*SessionResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedAuthServiceServer) SignUp(context.Context, *UserAccess) (*Session, error) {
+func (UnimplementedAuthServiceServer) SignUp(context.Context, *UserAccess) (*SessionResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignUp not implemented")
 }
-func (UnimplementedAuthServiceServer) Logout(context.Context, *Session) (*Message, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
+func (UnimplementedAuthServiceServer) LogOut(context.Context, *UserAccess) (*Message, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LogOut not implemented")
 }
 func (UnimplementedAuthServiceServer) SetContainerId(context.Context, *Container) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetContainerId not implemented")
@@ -144,6 +155,9 @@ func (UnimplementedAuthServiceServer) GetContainerId(context.Context, *Session) 
 }
 func (UnimplementedAuthServiceServer) DeleteAccount(context.Context, *Session) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAccount not implemented")
+}
+func (UnimplementedAuthServiceServer) ChanePasswd(context.Context, *ChangeInfo) (*Message, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ChanePasswd not implemented")
 }
 func (UnimplementedAuthServiceServer) EmailVail(context.Context, *Session) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EmailVail not implemented")
@@ -174,7 +188,7 @@ func _AuthService_Login_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/AuthService/Login",
+		FullMethod: "/proto.AuthService/Login",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServiceServer).Login(ctx, req.(*UserAccess))
@@ -192,7 +206,7 @@ func _AuthService_SignUp_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/AuthService/SignUp",
+		FullMethod: "/proto.AuthService/SignUp",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServiceServer).SignUp(ctx, req.(*UserAccess))
@@ -200,20 +214,20 @@ func _AuthService_SignUp_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Session)
+func _AuthService_LogOut_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserAccess)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).Logout(ctx, in)
+		return srv.(AuthServiceServer).LogOut(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/AuthService/Logout",
+		FullMethod: "/proto.AuthService/LogOut",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).Logout(ctx, req.(*Session))
+		return srv.(AuthServiceServer).LogOut(ctx, req.(*UserAccess))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -228,7 +242,7 @@ func _AuthService_SetContainerId_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/AuthService/SetContainerId",
+		FullMethod: "/proto.AuthService/SetContainerId",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServiceServer).SetContainerId(ctx, req.(*Container))
@@ -246,7 +260,7 @@ func _AuthService_GetContainerId_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/AuthService/GetContainerId",
+		FullMethod: "/proto.AuthService/GetContainerId",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServiceServer).GetContainerId(ctx, req.(*Session))
@@ -264,10 +278,28 @@ func _AuthService_DeleteAccount_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/AuthService/DeleteAccount",
+		FullMethod: "/proto.AuthService/DeleteAccount",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServiceServer).DeleteAccount(ctx, req.(*Session))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_ChanePasswd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangeInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ChanePasswd(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.AuthService/ChanePasswd",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ChanePasswd(ctx, req.(*ChangeInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -282,7 +314,7 @@ func _AuthService_EmailVail_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/AuthService/EmailVail",
+		FullMethod: "/proto.AuthService/EmailVail",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServiceServer).EmailVail(ctx, req.(*Session))
@@ -300,7 +332,7 @@ func _AuthService_IsVailEmail_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/AuthService/IsVailEmail",
+		FullMethod: "/proto.AuthService/IsVailEmail",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServiceServer).IsVailEmail(ctx, req.(*Session))
@@ -312,7 +344,7 @@ func _AuthService_IsVailEmail_Handler(srv interface{}, ctx context.Context, dec 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var AuthService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "AuthService",
+	ServiceName: "proto.AuthService",
 	HandlerType: (*AuthServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -324,8 +356,8 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AuthService_SignUp_Handler,
 		},
 		{
-			MethodName: "Logout",
-			Handler:    _AuthService_Logout_Handler,
+			MethodName: "LogOut",
+			Handler:    _AuthService_LogOut_Handler,
 		},
 		{
 			MethodName: "SetContainerId",
@@ -338,6 +370,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteAccount",
 			Handler:    _AuthService_DeleteAccount_Handler,
+		},
+		{
+			MethodName: "ChanePasswd",
+			Handler:    _AuthService_ChanePasswd_Handler,
 		},
 		{
 			MethodName: "EmailVail",

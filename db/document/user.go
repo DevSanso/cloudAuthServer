@@ -22,15 +22,24 @@ const (
 
 
 func (u *User)ToBson() bson.D {
-	return bson.D{{UserCollectionEmailFieldName,u.Email},
+	return bson.D{
+	{UserCollectionEmailFieldName,u.Email},
 	{UserCollectionPasswdFieldName,u.Passwd},
 	{UserCollectionIsVaildFieldName,false}}
 }
 
 func (u *User)ToBsonAndHashingPasswd() bson.D {
-	return bson.D{{UserCollectionEmailFieldName,u.Email},
+	return bson.D{
+	{UserCollectionEmailFieldName,u.Email},
 	{UserCollectionPasswdFieldName,u.passwordHashing()},
 	{UserCollectionIsVaildFieldName,false}}
+}
+
+func(u *User)ToBsonSubVailEmailAndHashing() bson.D {
+	return bson.D{
+		{UserCollectionEmailFieldName,u.Email},
+		{UserCollectionPasswdFieldName,u.passwordHashing()},
+	}
 }
 func(u *User)passwordHashing() string {
 	return string(pbkdf2.Key([]byte(u.Passwd),[]byte(u.Email),1000,64,sha256.New))

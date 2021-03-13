@@ -25,14 +25,21 @@ func (u *User)ToBson() bson.D {
 	return bson.D{
 	{UserCollectionEmailFieldName,u.Email},
 	{UserCollectionPasswdFieldName,u.Passwd},
-	{UserCollectionIsVaildFieldName,false}}
+	{UserCollectionIsVaildFieldName,u.IsVailEmail}}
+}
+
+func(u *User)ToBsonSubVailEmail() bson.D {
+	return bson.D{
+		{UserCollectionEmailFieldName,u.Email},
+		{UserCollectionPasswdFieldName,u.Passwd},
+	}
 }
 
 func (u *User)ToBsonAndHashingPasswd() bson.D {
 	return bson.D{
 	{UserCollectionEmailFieldName,u.Email},
 	{UserCollectionPasswdFieldName,u.passwordHashing()},
-	{UserCollectionIsVaildFieldName,false}}
+	{UserCollectionIsVaildFieldName,u.IsVailEmail}}
 }
 
 func(u *User)ToBsonSubVailEmailAndHashing() bson.D {

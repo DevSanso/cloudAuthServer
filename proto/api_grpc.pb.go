@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 type AuthServiceClient interface {
 	Login(ctx context.Context, in *UserAccess, opts ...grpc.CallOption) (*SessionResult, error)
 	SignUp(ctx context.Context, in *UserAccess, opts ...grpc.CallOption) (*SessionResult, error)
-	LogOut(ctx context.Context, in *UserAccess, opts ...grpc.CallOption) (*Message, error)
+	LogOut(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error)
 	SetContainerId(ctx context.Context, in *Container, opts ...grpc.CallOption) (*Message, error)
 	GetContainerId(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error)
 	DeleteAccount(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error)
@@ -55,7 +55,7 @@ func (c *authServiceClient) SignUp(ctx context.Context, in *UserAccess, opts ...
 	return out, nil
 }
 
-func (c *authServiceClient) LogOut(ctx context.Context, in *UserAccess, opts ...grpc.CallOption) (*Message, error) {
+func (c *authServiceClient) LogOut(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error) {
 	out := new(Message)
 	err := c.cc.Invoke(ctx, "/proto.AuthService/LogOut", in, out, opts...)
 	if err != nil {
@@ -124,7 +124,7 @@ func (c *authServiceClient) IsVailEmail(ctx context.Context, in *Session, opts .
 type AuthServiceServer interface {
 	Login(context.Context, *UserAccess) (*SessionResult, error)
 	SignUp(context.Context, *UserAccess) (*SessionResult, error)
-	LogOut(context.Context, *UserAccess) (*Message, error)
+	LogOut(context.Context, *Session) (*Message, error)
 	SetContainerId(context.Context, *Container) (*Message, error)
 	GetContainerId(context.Context, *Session) (*Message, error)
 	DeleteAccount(context.Context, *Session) (*Message, error)
@@ -144,7 +144,7 @@ func (UnimplementedAuthServiceServer) Login(context.Context, *UserAccess) (*Sess
 func (UnimplementedAuthServiceServer) SignUp(context.Context, *UserAccess) (*SessionResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignUp not implemented")
 }
-func (UnimplementedAuthServiceServer) LogOut(context.Context, *UserAccess) (*Message, error) {
+func (UnimplementedAuthServiceServer) LogOut(context.Context, *Session) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LogOut not implemented")
 }
 func (UnimplementedAuthServiceServer) SetContainerId(context.Context, *Container) (*Message, error) {
@@ -215,7 +215,7 @@ func _AuthService_SignUp_Handler(srv interface{}, ctx context.Context, dec func(
 }
 
 func _AuthService_LogOut_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserAccess)
+	in := new(Session)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -227,7 +227,7 @@ func _AuthService_LogOut_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: "/proto.AuthService/LogOut",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).LogOut(ctx, req.(*UserAccess))
+		return srv.(AuthServiceServer).LogOut(ctx, req.(*Session))
 	}
 	return interceptor(ctx, in, info, handler)
 }

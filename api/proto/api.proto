@@ -7,7 +7,7 @@ option go_package="proto";
 service AuthService {
     rpc Login(UserAccess) returns (SessionResult);
     rpc SignUp(UserAccess) returns (SessionResult);
-    rpc LogOut(UserAccess) returns (Message);
+    rpc LogOut(Session) returns (Message);
     rpc SetContainerId(Container) returns (Message);
     rpc GetContainerId(Session) returns (Message);
     rpc DeleteAccount(Session) returns (Message);

@@ -11,7 +11,7 @@ service AuthService {
     rpc SetContainerId(Container) returns (Message);
     rpc GetContainerId(Session) returns (Message);
     rpc DeleteAccount(Session) returns (Message);
-    rpc ChanePasswd(ChangeInfo) returns (Message);
+    rpc ChangePasswd(ChangeInfo) returns (Message);
     rpc EmailVail(Session) returns (Message);
     rpc IsVailEmail(Session) returns (Message);
 }

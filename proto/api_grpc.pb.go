@@ -24,7 +24,7 @@ type AuthServiceClient interface {
 	SetContainerId(ctx context.Context, in *Container, opts ...grpc.CallOption) (*Message, error)
 	GetContainerId(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error)
 	DeleteAccount(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error)
-	ChanePasswd(ctx context.Context, in *ChangeInfo, opts ...grpc.CallOption) (*Message, error)
+	ChangePasswd(ctx context.Context, in *ChangeInfo, opts ...grpc.CallOption) (*Message, error)
 	EmailVail(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error)
 	IsVailEmail(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Message, error)
 }
@@ -91,9 +91,9 @@ func (c *authServiceClient) DeleteAccount(ctx context.Context, in *Session, opts
 	return out, nil
 }
 
-func (c *authServiceClient) ChanePasswd(ctx context.Context, in *ChangeInfo, opts ...grpc.CallOption) (*Message, error) {
+func (c *authServiceClient) ChangePasswd(ctx context.Context, in *ChangeInfo, opts ...grpc.CallOption) (*Message, error) {
 	out := new(Message)
-	err := c.cc.Invoke(ctx, "/proto.AuthService/ChanePasswd", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/ChangePasswd", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ type AuthServiceServer interface {
 	SetContainerId(context.Context, *Container) (*Message, error)
 	GetContainerId(context.Context, *Session) (*Message, error)
 	DeleteAccount(context.Context, *Session) (*Message, error)
-	ChanePasswd(context.Context, *ChangeInfo) (*Message, error)
+	ChangePasswd(context.Context, *ChangeInfo) (*Message, error)
 	EmailVail(context.Context, *Session) (*Message, error)
 	IsVailEmail(context.Context, *Session) (*Message, error)
 	mustEmbedUnimplementedAuthServiceServer()
@@ -156,8 +156,8 @@ func (UnimplementedAuthServiceServer) GetContainerId(context.Context, *Session) 
 func (UnimplementedAuthServiceServer) DeleteAccount(context.Context, *Session) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAccount not implemented")
 }
-func (UnimplementedAuthServiceServer) ChanePasswd(context.Context, *ChangeInfo) (*Message, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ChanePasswd not implemented")
+func (UnimplementedAuthServiceServer) ChangePasswd(context.Context, *ChangeInfo) (*Message, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ChangePasswd not implemented")
 }
 func (UnimplementedAuthServiceServer) EmailVail(context.Context, *Session) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EmailVail not implemented")
@@ -286,20 +286,20 @@ func _AuthService_DeleteAccount_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_ChanePasswd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AuthService_ChangePasswd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ChangeInfo)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).ChanePasswd(ctx, in)
+		return srv.(AuthServiceServer).ChangePasswd(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.AuthService/ChanePasswd",
+		FullMethod: "/proto.AuthService/ChangePasswd",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).ChanePasswd(ctx, req.(*ChangeInfo))
+		return srv.(AuthServiceServer).ChangePasswd(ctx, req.(*ChangeInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -372,8 +372,8 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AuthService_DeleteAccount_Handler,
 		},
 		{
-			MethodName: "ChanePasswd",
-			Handler:    _AuthService_ChanePasswd_Handler,
+			MethodName: "ChangePasswd",
+			Handler:    _AuthService_ChangePasswd_Handler,
 		},
 		{
 			MethodName: "EmailVail",

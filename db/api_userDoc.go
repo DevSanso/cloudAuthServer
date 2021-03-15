@@ -34,6 +34,17 @@ func RegisterUser(ctx context.Context,user *document.User) error {
 	})
 
 }
+func GetUserId(ctx context.Context,user *document.User) (int,error) {
+	session,err := _client.StartSession(options.Session())
+	if err != nil {return 0,err}
+	var res bson.M
+	err = session.Client().Database(_databaseName).
+	Collection(document.MappingName).
+	FindOne(ctx,user.ToBsonSubVailEmailAndHashing()).
+	Decode(&res)
+	if err != nil {return 0,err}
+	return res["_id"].(int),nil
+}
 
 func ExistUser(ctx context.Context,user *document.User) (bool,error) {
 	var res bson.M
@@ -48,9 +59,8 @@ func ExistUser(ctx context.Context,user *document.User) (bool,error) {
 		Collection(document.UserName).
 		FindOne(ctx,info).
 		Decode(&res)
-		
-		session.EndSession(ctx)
-		return err
+		if err != nil {session.AbortTransaction(ctx);return err}
+		return session.CommitTransaction(ctx)
 	})
 
 	
@@ -59,3 +69,4 @@ func ExistUser(ctx context.Context,user *document.User) (bool,error) {
 	}
 	return false,err
 }
+

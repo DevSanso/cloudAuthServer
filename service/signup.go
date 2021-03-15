@@ -7,6 +7,7 @@ import (
 	"cloudAuthServer/db"
 
 	"context"
+	"log"
 	"errors"
 
 	"google.golang.org/grpc/codes"
@@ -25,7 +26,10 @@ func (s *Service) SignUp(ctx context.Context,userInfo *rpc.UserAccess) (*rpc.Ses
 
 	isExist,err := db.ExistUser(ctx,user)
 
-	if err != nil {return nil,status.Errorf(codes.Internal,err.Error())}
+	if err != nil {
+		log.Println(err.Error())
+		return nil,status.Errorf(codes.Internal,err.Error())
+	}
 	if isExist {return nil,status.Errorf(codes.AlreadyExists,AlreadyExistUserErr.Error())}
 
 	err = db.RegisterUser(ctx,user)

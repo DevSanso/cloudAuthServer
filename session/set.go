@@ -4,11 +4,11 @@ import (
 	"github.com/tidwall/buntdb"
 	"time"
 )
-func Set(key,value string) error {
+func Set(key,userId string) error {
 	tx,err := _db.Begin(true)
 	if err != nil {return err}
 	
-	_,_,err=tx.Set(key,value,nil)
+	_,_,err=tx.Set(key,userId,nil)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -17,11 +17,11 @@ func Set(key,value string) error {
 	return err
 }
 
-func SetTimeOut(key,value string,duration time.Duration) error {
+func SetTimeOut(key,userId string,duration time.Duration) error {
 	tx,err := _db.Begin(true)
 	if err != nil {return err}
 	
-	_,_,err=tx.Set(key,value,&buntdb.SetOptions{true,duration})
+	_,_,err=tx.Set(key,userId,&buntdb.SetOptions{true,duration})
 	if err != nil {
 		tx.Rollback()
 		return err
